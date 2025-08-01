@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { Dumbbell, TrendingUp, Users, Award, Star, ChevronRight } from "lucide-react"
+import { Dumbbell, TrendingUp, Users } from "lucide-react"
 import LoginForm from "./LoginForm"
 import SignUpForm from "./SignUpForm"
 import CustomCursor from "./CustomCursor"
@@ -24,22 +24,25 @@ export default function LandingPage({ onGuestLogin }: LandingPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-400 to-orange-400 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 relative overflow-hidden">
+      {/* Subtle overlay for better contrast */}
+      <div className="absolute inset-0 bg-black/10"></div>
+
       <CustomCursor />
 
       {/* Floating Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, i) => (
+        {[...Array(15)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-2 h-2 bg-white/20 rounded-full"
+            className="absolute w-2 h-2 bg-white/15 rounded-full"
             animate={{
-              x: [0, 100, 0],
-              y: [0, -100, 0],
-              scale: [1, 1.5, 1],
+              x: [0, 80, 0],
+              y: [0, -80, 0],
+              scale: [1, 1.3, 1],
             }}
             transition={{
-              duration: 10 + i * 2,
+              duration: 8 + i * 1.5,
               repeat: Number.POSITIVE_INFINITY,
               ease: "easeInOut",
             }}
@@ -54,101 +57,160 @@ export default function LandingPage({ onGuestLogin }: LandingPageProps) {
       <div className="relative z-10">
         {/* Header */}
         <motion.header
-          initial={{ opacity: 0, y: -50 }}
+          initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="px-6 py-8"
+          transition={{ duration: 0.6 }}
+          className="px-6 py-6"
         >
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <motion.div className="flex items-center space-x-3" whileHover={{ scale: 1.05 }}>
-              <div className="bg-white/20 backdrop-blur-xl p-3 rounded-2xl border border-white/30">
-                <Dumbbell className="h-8 w-8 text-white" />
+            <motion.div className="flex items-center space-x-3" whileHover={{ scale: 1.02 }}>
+              <div className="bg-white/20 backdrop-blur-xl p-2.5 rounded-xl border border-white/30">
+                <Dumbbell className="h-7 w-7 text-white" />
               </div>
-              <h1 className="text-3xl font-bold text-white">RackMate</h1>
+              <h1 className="text-2xl font-bold text-white">RackMate</h1>
             </motion.div>
 
-            <div className="flex space-x-4">
-              <motion.button
+            <div className="flex items-center space-x-6">
+              <button
                 onClick={() => setShowLogin(true)}
-                className="bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-2xl font-semibold hover:bg-white/30 transition-all duration-300 border border-white/30"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
+                className="text-white/90 hover:text-white font-medium transition-colors duration-200"
               >
-                Login
-              </motion.button>
-              <motion.button
-                onClick={() => setShowSignUp(true)}
-                className="bg-white text-purple-600 px-6 py-3 rounded-2xl font-semibold shadow-xl hover:shadow-2xl transition-all duration-300"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
+                Sign In
+              </button>
+              <button
+                onClick={onGuestLogin}
+                className="text-white/90 hover:text-white font-medium transition-colors duration-200"
               >
-                Sign Up
-              </motion.button>
+                Try Demo
+              </button>
             </div>
           </div>
         </motion.header>
 
         {/* Hero Section */}
         <motion.section
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="px-6 py-20"
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="px-6 py-12"
         >
-          <div className="max-w-4xl mx-auto text-center">
-            <motion.h2
-              className="text-6xl md:text-8xl font-bold text-white mb-8 leading-tight"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            >
-              Your Fitness
-              <br />
-              <span className="bg-gradient-to-r from-yellow-300 to-pink-300 bg-clip-text text-transparent">
-                Journey
-              </span>
-            </motion.h2>
+          <div className="max-w-7xl mx-auto">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              {/* Left Column - Content */}
+              <div className="text-center lg:text-left">
+                <motion.h2
+                  className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                  Reach your fitness goals
+                </motion.h2>
 
-            <motion.p
-              className="text-xl md:text-2xl text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-            >
-              Track workouts, monitor progress, and achieve your fitness goals with our beautiful and intuitive app.
-            </motion.p>
+                <motion.p
+                  className="text-lg text-white/90 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                >
+                  Track workouts, monitor progress, and stay motivated with our intuitive fitness app.
+                </motion.p>
 
-            <motion.div
-              className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.8 }}
-            >
-              <motion.button
-                onClick={() => setShowSignUp(true)}
-                className="w-full bg-white text-purple-600 py-4 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300"
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
+                <motion.div
+                  className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center mb-8"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                >
+                  <motion.button
+                    onClick={() => setShowSignUp(true)}
+                    className="bg-white text-purple-600 py-4 px-8 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl hover:bg-gray-50 transition-all duration-200 border-2 border-transparent hover:border-white/20"
+                    whileHover={{ scale: 1.02, y: -1 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Get Started
+                  </motion.button>
+
+                  {/* App Store Badges */}
+                  <div className="flex items-center space-x-3">
+                    <div className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20">
+                      <span className="text-white/80 text-sm font-medium">App Store</span>
+                    </div>
+                    <div className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20">
+                      <span className="text-white/80 text-sm font-medium">Google Play</span>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.p
+                  className="text-white/70 text-sm"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 0.5 }}
+                >
+                  Over 50,000 workouts logged
+                </motion.p>
+              </div>
+
+              {/* Right Column - App Mockup */}
+              <motion.div
+                className="relative"
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
               >
-                Get Started 🚀
-              </motion.button>
-              <motion.button
-                onClick={() => setShowLogin(true)}
-                className="w-full bg-white/20 backdrop-blur-sm text-white py-4 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl border border-white/30 hover:bg-white/30 transition-all duration-300"
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Sign In 💪
-              </motion.button>
-              <motion.button
-                onClick={onGuestLogin}
-                className="w-full bg-white/20 backdrop-blur-sm text-white py-4 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl border border-white/30 hover:bg-white/30 transition-all duration-300"
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Try as Guest 👤
-              </motion.button>
-            </motion.div>
+                <div className="relative mx-auto w-80 h-96 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl overflow-hidden">
+                  {/* Phone Frame */}
+                  <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-white/30 rounded-full"></div>
+
+                  {/* Mock App Interface */}
+                  <div className="p-6 pt-12">
+                    <div className="bg-white/20 rounded-2xl p-4 mb-4">
+                      <div className="flex items-center space-x-3 mb-3">
+                        <div className="w-8 h-8 bg-green-400 rounded-full"></div>
+                        <div>
+                          <div className="w-20 h-3 bg-white/40 rounded mb-1"></div>
+                          <div className="w-16 h-2 bg-white/30 rounded"></div>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="w-full h-2 bg-white/30 rounded"></div>
+                        <div className="w-3/4 h-2 bg-white/30 rounded"></div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white/20 rounded-2xl p-4 mb-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="w-24 h-3 bg-white/40 rounded"></div>
+                        <div className="w-12 h-3 bg-blue-400 rounded"></div>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        <div className="h-8 bg-white/30 rounded"></div>
+                        <div className="h-8 bg-white/30 rounded"></div>
+                        <div className="h-8 bg-white/30 rounded"></div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white/20 rounded-2xl p-4">
+                      <div className="w-20 h-3 bg-white/40 rounded mb-3"></div>
+                      <div className="h-16 bg-gradient-to-r from-purple-400/50 to-pink-400/50 rounded-xl"></div>
+                    </div>
+                  </div>
+
+                  {/* Animated Elements */}
+                  <motion.div
+                    className="absolute top-20 right-4 w-3 h-3 bg-green-400 rounded-full"
+                    animate={{ scale: [1, 1.2, 1], opacity: [1, 0.7, 1] }}
+                    transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+                  />
+                  <motion.div
+                    className="absolute bottom-32 left-6 w-2 h-2 bg-blue-400 rounded-full"
+                    animate={{ scale: [1, 1.3, 1], opacity: [1, 0.6, 1] }}
+                    transition={{ duration: 2.5, repeat: Number.POSITIVE_INFINITY, delay: 0.5 }}
+                  />
+                </div>
+              </motion.div>
+            </div>
           </div>
         </motion.section>
 
@@ -156,117 +218,40 @@ export default function LandingPage({ onGuestLogin }: LandingPageProps) {
         <motion.section
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 1 }}
-          className="px-6 py-20"
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="px-6 py-16"
         >
-          <div className="max-w-6xl mx-auto">
-            <motion.h3
-              className="text-4xl md:text-5xl font-bold text-white text-center mb-16"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 1.2 }}
-            >
-              Why Choose RackMate?
-            </motion.h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
                 {
                   icon: TrendingUp,
                   title: "Track Progress",
-                  description: "Monitor your gains with beautiful charts and analytics",
+                  description: "Monitor your gains with detailed analytics.",
                 },
                 {
                   icon: Dumbbell,
                   title: "Log Workouts",
-                  description: "Easy-to-use interface for recording your exercises",
+                  description: "Record exercises with our intuitive interface.",
                 },
                 {
                   icon: Users,
-                  title: "Community",
-                  description: "Connect with fellow fitness enthusiasts",
-                },
-                {
-                  icon: Award,
-                  title: "Achievements",
-                  description: "Unlock badges and celebrate milestones",
+                  title: "Join Community",
+                  description: "Connect with fellow fitness enthusiasts.",
                 },
               ].map((feature, index) => (
                 <motion.div
                   key={feature.title}
-                  className="bg-white/20 backdrop-blur-xl p-8 rounded-3xl border border-white/30 text-center"
+                  className="text-center"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 1.4 + index * 0.1 }}
-                  whileHover={{ scale: 1.05, y: -5 }}
+                  transition={{ duration: 0.6, delay: 0.7 + index * 0.1 }}
                 >
-                  <div className="bg-white/20 backdrop-blur-sm p-4 rounded-2xl w-fit mx-auto mb-6">
+                  <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/30">
                     <feature.icon className="h-8 w-8 text-white" />
                   </div>
-                  <h4 className="text-xl font-bold text-white mb-4">{feature.title}</h4>
-                  <p className="text-white/80 leading-relaxed">{feature.description}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </motion.section>
-
-        {/* Testimonials */}
-        <motion.section
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 1.6 }}
-          className="px-6 py-20"
-        >
-          <div className="max-w-4xl mx-auto text-center">
-            <motion.h3
-              className="text-4xl md:text-5xl font-bold text-white mb-16"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 1.8 }}
-            >
-              Loved by Thousands
-            </motion.h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                {
-                  name: "Sarah Johnson",
-                  role: "Fitness Enthusiast",
-                  content: "RackMate transformed my workout routine. The progress tracking is incredible!",
-                  rating: 5,
-                },
-                {
-                  name: "Mike Chen",
-                  role: "Personal Trainer",
-                  content: "I recommend RackMate to all my clients. It's intuitive and motivating.",
-                  rating: 5,
-                },
-                {
-                  name: "Emma Davis",
-                  role: "Beginner",
-                  content: "Perfect for someone just starting their fitness journey. Love the design!",
-                  rating: 5,
-                },
-              ].map((testimonial, index) => (
-                <motion.div
-                  key={testimonial.name}
-                  className="bg-white/20 backdrop-blur-xl p-8 rounded-3xl border border-white/30"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 2 + index * 0.1 }}
-                  whileHover={{ scale: 1.02 }}
-                >
-                  <div className="flex justify-center mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 text-yellow-300 fill-current" />
-                    ))}
-                  </div>
-                  <p className="text-white/90 mb-6 italic">"{testimonial.content}"</p>
-                  <div>
-                    <p className="text-white font-semibold">{testimonial.name}</p>
-                    <p className="text-white/70 text-sm">{testimonial.role}</p>
-                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">{feature.title}</h3>
+                  <p className="text-white/80 text-lg leading-relaxed">{feature.description}</p>
                 </motion.div>
               ))}
             </div>
@@ -277,28 +262,27 @@ export default function LandingPage({ onGuestLogin }: LandingPageProps) {
         <motion.section
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 2.4 }}
-          className="px-6 py-20"
+          transition={{ duration: 0.6, delay: 0.9 }}
+          className="px-6 py-16"
         >
           <div className="max-w-4xl mx-auto text-center">
             <motion.div
-              className="bg-white/20 backdrop-blur-xl p-12 rounded-3xl border border-white/30"
-              initial={{ opacity: 0, scale: 0.9 }}
+              className="bg-white/15 backdrop-blur-xl p-10 rounded-3xl border border-white/20"
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 2.6 }}
+              transition={{ duration: 0.6, delay: 1 }}
             >
-              <h3 className="text-4xl md:text-5xl font-bold text-white mb-6">Ready to Transform?</h3>
-              <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-                Join thousands of users who have already started their fitness journey with RackMate.
+              <h3 className="text-4xl font-bold text-white mb-4">Ready to start?</h3>
+              <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed">
+                Join thousands of users who have transformed their fitness with RackMate.
               </p>
               <motion.button
                 onClick={() => setShowSignUp(true)}
-                className="bg-white text-purple-600 px-8 py-4 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 inline-flex items-center space-x-2"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
+                className="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl hover:bg-gray-50 transition-all duration-200 border-2 border-transparent hover:border-white/20"
+                whileHover={{ scale: 1.02, y: -1 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <span>Start Your Journey</span>
-                <ChevronRight className="h-5 w-5" />
+                Get Started
               </motion.button>
             </motion.div>
           </div>
@@ -308,17 +292,26 @@ export default function LandingPage({ onGuestLogin }: LandingPageProps) {
         <motion.footer
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 2.8 }}
-          className="px-6 py-12 border-t border-white/20"
+          transition={{ duration: 0.6, delay: 1.1 }}
+          className="px-6 py-8 border-t border-white/20"
         >
-          <div className="max-w-7xl mx-auto text-center">
-            <div className="flex items-center justify-center space-x-3 mb-6">
-              <div className="bg-white/20 backdrop-blur-xl p-2 rounded-xl border border-white/30">
-                <Dumbbell className="h-6 w-6 text-white" />
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+              <div className="flex items-center space-x-3">
+                <div className="bg-white/20 backdrop-blur-xl p-2 rounded-lg border border-white/30">
+                  <Dumbbell className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-lg font-bold text-white">RackMate</span>
               </div>
-              <h1 className="text-2xl font-bold text-white">RackMate</h1>
+
+              <div className="flex items-center space-x-6 text-sm">
+                <button className="text-white/70 hover:text-white transition-colors">Contact</button>
+                <button className="text-white/70 hover:text-white transition-colors">Privacy</button>
+                <button className="text-white/70 hover:text-white transition-colors">Terms</button>
+              </div>
+
+              <p className="text-white/60 text-sm">© 2024 RackMate</p>
             </div>
-            <p className="text-white/70">© 2024 RackMate. Made with ❤️ for fitness enthusiasts everywhere.</p>
           </div>
         </motion.footer>
       </div>

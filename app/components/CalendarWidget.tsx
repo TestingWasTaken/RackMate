@@ -1,14 +1,15 @@
 "use client"
 
-import { useState } from "react"
 import { motion } from "framer-motion"
-import { ChevronLeft, ChevronRight, Calendar } from "lucide-react"
+import { Calendar, ChevronLeft, ChevronRight } from "lucide-react"
+import { useState } from "react"
+import type { Workout } from "../types/workout"
 
 interface CalendarWidgetProps {
-  onClose?: () => void
+  workouts: Workout[]
 }
 
-export default function CalendarWidget({ onClose }: CalendarWidgetProps) {
+export default function CalendarWidget({ workouts }: CalendarWidgetProps) {
   const [currentDate, setCurrentDate] = useState(new Date())
 
   const getDaysInMonth = (date: Date) => {
@@ -19,103 +20,106 @@ export default function CalendarWidget({ onClose }: CalendarWidgetProps) {
     return new Date(date.getFullYear(), date.getMonth(), 1).getDay()
   }
 
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ]
+  const hasWorkoutOnDate = (date: Date) => {
+    return workouts.some((workout) => {
+      const workoutDate = new Date(workout.date)
+      return workoutDate.toDateString() === date.toDateString()
+    })
+  }
+
+  const navigateMonth = (direction: "prev" | "next") => {
+    setCurrentDate((prev) => {
+      const newDate = new Date(prev)
+      if (direction === "prev") {
+        newDate.setMonth(prev.getMonth() - 1)
+      } else {
+        newDate.setMonth(prev.getMonth() + 1)
+      }
+      return newDate
+    })
+  }
 
   const daysInMonth = getDaysInMonth(currentDate)
   const firstDay = getFirstDayOfMonth(currentDate)
-  const today = new Date()
-
-  const previousMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1))
-  }
-
-  const nextMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1))
-  }
-
-  const days = []
-
-  // Empty cells for days before the first day of the month
-  for (let i = 0; i < firstDay; i++) {
-    days.push(<div key={`empty-${i}`} className="h-8"></div>)
-  }
-
-  // Days of the month
-  for (let day = 1; day <= daysInMonth; day++) {
-    const isToday =
-      today.getDate() === day &&
-      today.getMonth() === currentDate.getMonth() &&
-      today.getFullYear() === currentDate.getFullYear()
-
-    days.push(
-      <motion.div
-        key={day}
-        className={`h-8 w-8 flex items-center justify-center rounded-lg text-sm cursor-pointer transition-colors ${
-          isToday ? "bg-white text-purple-600 font-bold" : "text-white hover:bg-white/20"
-        }`}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-      >
-        {day}
-      </motion.div>,
-    )
-  }
+  const monthName = currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="bg-white/20 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-xl w-80"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100"
     >
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold text-gray-800 flex items-center space-x-2">
+          <Calendar className="h-6 w-6" />
+          <span>Workout Calendar</span>
+        </h2>
         <div className="flex items-center space-x-2">
-          <Calendar className="h-5 w-5 text-white" />
-          <h3 className="text-white font-semibold">
-            {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-          </h3>
-        </div>
-        <div className="flex items-center space-x-2">
-          <motion.button
-            onClick={previousMonth}
-            className="p-1 rounded-lg hover:bg-white/20 transition-colors"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+          <button
+            onClick={() => navigateMonth("prev")}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Previous month"
           >
-            <ChevronLeft className="h-4 w-4 text-white" />
-          </motion.button>
-          <motion.button
-            onClick={nextMonth}
-            className="p-1 rounded-lg hover:bg-white/20 transition-colors"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <span className="text-lg font-semibold text-gray-700 min-w-[200px] text-center">{monthName}</span>
+          <button
+            onClick={() => navigateMonth("next")}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Next month"
           >
-            <ChevronRight className="h-4 w-4 text-white" />
-          </motion.button>
+            <ChevronRight className="h-5 w-5" />
+          </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 mb-2">
-        {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
-          <div key={day} className="h-8 flex items-center justify-center text-white/60 text-xs font-medium">
+      <div className="grid grid-cols-7 gap-2">
+        {/* Day headers */}
+        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+          <div key={day} className="text-center text-sm font-medium text-gray-600 py-2">
             {day}
           </div>
         ))}
+
+        {/* Empty cells for days before month starts */}
+        {Array.from({ length: firstDay }, (_, i) => (
+          <div key={`empty-${i}`} className="h-10"></div>
+        ))}
+
+        {/* Days of the month */}
+        {Array.from({ length: daysInMonth }, (_, i) => {
+          const day = i + 1
+          const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
+          const hasWorkout = hasWorkoutOnDate(date)
+          const isToday = date.toDateString() === new Date().toDateString()
+
+          return (
+            <div
+              key={day}
+              className={`h-10 flex items-center justify-center text-sm rounded-lg transition-colors ${
+                isToday
+                  ? "bg-blue-600 text-white font-bold"
+                  : hasWorkout
+                    ? "bg-green-100 text-green-800 font-semibold"
+                    : "text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              {day}
+            </div>
+          )
+        })}
       </div>
 
-      <div className="grid grid-cols-7 gap-1">{days}</div>
+      <div className="mt-6 flex items-center justify-center space-x-6 text-sm">
+        <div className="flex items-center space-x-2">
+          <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+          <span className="text-gray-600">Today</span>
+        </div>
+        <div className="flex items-center space-x-2">
+          <div className="w-3 h-3 bg-green-100 border-2 border-green-500 rounded-full"></div>
+          <span className="text-gray-600">Workout Day</span>
+        </div>
+      </div>
     </motion.div>
   )
 }

@@ -1,17 +1,30 @@
-import { initializeApp } from "firebase/app"
-import { getAuth } from "firebase/auth"
-import { getFirestore } from "firebase/firestore"
+// Mock Firebase configuration for demo purposes
+// In production, replace with actual Firebase config
 
-const firebaseConfig = {
-  // Replace with your Firebase config
-  apiKey: "your-api-key",
-  authDomain: "your-auth-domain",
-  projectId: "your-project-id",
-  storageBucket: "your-storage-bucket",
-  messagingSenderId: "your-messaging-sender-id",
-  appId: "your-app-id",
+export const auth = {
+  currentUser: null,
+  onAuthStateChanged: (callback: (user: any) => void) => {
+    // Mock auth state change
+    return () => {}
+  },
 }
 
-const app = initializeApp(firebaseConfig)
-export const auth = getAuth(app)
-export const db = getFirestore(app)
+export const signInWithEmailAndPassword = async (auth: any, email: string, password: string) => {
+  // Mock sign in
+  return Promise.resolve({ user: { uid: "mock-user", email } })
+}
+
+export const createUserWithEmailAndPassword = async (auth: any, email: string, password: string) => {
+  // Mock sign up
+  return Promise.resolve({ user: { uid: "mock-user", email } })
+}
+
+export const updateProfile = async (user: any, profile: any) => {
+  // Mock profile update
+  return Promise.resolve()
+}
+
+export const signInAnonymously = async (auth: any) => {
+  // Mock anonymous sign in
+  return Promise.resolve({ user: { uid: "anonymous-user", isAnonymous: true } })
+}

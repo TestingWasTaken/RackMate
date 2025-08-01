@@ -1,9 +1,11 @@
 export interface Set {
+  id: string
   reps: number
   weight: number
 }
 
 export interface Exercise {
+  id: string
   name: string
   sets: Set[]
 }
@@ -11,8 +13,7 @@ export interface Exercise {
 export interface Workout {
   id: string
   name: string
-  exercises: Exercise[]
   date: string
-  duration: number
-  userId?: string
+  exercises: Exercise[]
+  duration?: number
 }

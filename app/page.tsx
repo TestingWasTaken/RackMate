@@ -1,24 +1,24 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import LandingPage from "./components/LandingPage"
 import Dashboard from "./components/Dashboard"
 import LoadingSpinner from "./components/LoadingSpinner"
 
-// Mock user type for demo
-interface MockUser {
+interface User {
   uid: string
-  email: string | null
-  isAnonymous: boolean
-  displayName: string | null
+  email?: string | null
+  displayName?: string | null
+  isAnonymous?: boolean
 }
 
-export default function RackMate() {
-  const [user, setUser] = useState<MockUser | null>(null)
+export default function Home() {
+  const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Simulate auth state check
+    // Simulate auth check
     const timer = setTimeout(() => {
       setLoading(false)
     }, 1000)
@@ -26,19 +26,15 @@ export default function RackMate() {
     return () => clearTimeout(timer)
   }, [])
 
-  const handleGuestLogin = async () => {
-    try {
-      // Create a guest user and go directly to workout logger
-      const guestUser: MockUser = {
-        uid: `guest_${Date.now()}`,
-        email: null,
-        isAnonymous: true,
-        displayName: null,
-      }
-      setUser(guestUser)
-    } catch (error) {
-      console.error("Error signing in as guest:", error)
+  const handleGuestLogin = () => {
+    // Create a guest user
+    const guestUser: User = {
+      uid: `guest_${Date.now()}`,
+      email: null,
+      displayName: null,
+      isAnonymous: true,
     }
+    setUser(guestUser)
   }
 
   const handleSignOut = () => {
@@ -49,9 +45,29 @@ export default function RackMate() {
     return <LoadingSpinner />
   }
 
-  return user ? (
-    <Dashboard user={user} onSignOut={handleSignOut} startWithWorkoutLogger={user.isAnonymous} />
-  ) : (
-    <LandingPage onGuestLogin={handleGuestLogin} />
+  return (
+    <AnimatePresence mode="wait">
+      {user ? (
+        <motion.div
+          key="dashboard"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Dashboard user={user} onSignOut={handleSignOut} />
+        </motion.div>
+      ) : (
+        <motion.div
+          key="landing"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <LandingPage onGuestLogin={handleGuestLogin} />
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }

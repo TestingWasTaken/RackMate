@@ -1,173 +1,163 @@
 "use client"
 
-import { useState } from "react"
-import { motion } from "framer-motion"
+import { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { Calendar, TrendingUp, Dumbbell, User, Plus } from "lucide-react"
 import Header from "./Header"
-import WorkoutForm from "./WorkoutForm"
+import StatsCards from "./StatsCards"
 import ProgressChart from "./ProgressChart"
 import WorkoutHistory from "./WorkoutHistory"
-import StatsCards from "./StatsCards"
+import WorkoutForm from "./WorkoutForm"
+import CalendarWidget from "./CalendarWidget"
 import NotificationPanel from "./NotificationPanel"
-import CustomCursor from "./CustomCursor"
-
-interface User {
-  uid: string
-  email: string | null
-  isAnonymous: boolean
-  displayName: string | null
-}
-
-interface Workout {
-  id: string
-  name: string
-  date: string
-  exercises: Array<{
-    name: string
-    sets: Array<{
-      reps: number
-      weight: number
-    }>
-  }>
-  userId: string
-}
+import LoadingSpinner from "./LoadingSpinner"
+import type { Workout } from "../types/workout"
 
 interface DashboardProps {
-  user: User
+  user: {
+    uid: string
+    email?: string | null
+    displayName?: string | null
+    isAnonymous?: boolean
+  }
   onSignOut: () => void
-  startWithWorkoutLogger?: boolean
 }
 
-export default function Dashboard({ user, onSignOut, startWithWorkoutLogger = false }: DashboardProps) {
+export default function Dashboard({ user, onSignOut }: DashboardProps) {
+  const [activeTab, setActiveTab] = useState("log-workout")
   const [workouts, setWorkouts] = useState<Workout[]>([])
-  const [activeTab, setActiveTab] = useState<"log" | "dashboard">(startWithWorkoutLogger ? "log" : "dashboard")
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [showNotifications, setShowNotifications] = useState(false)
 
-  const addWorkout = (workoutData: Omit<Workout, "id">) => {
-    const newWorkout = {
-      id: `workout_${Date.now()}`,
-      ...workoutData,
-      userId: user.uid,
-    }
-    setWorkouts([newWorkout, ...workouts])
-  }
+  useEffect(() => {
+    // Simulate loading
+    const timer = setTimeout(() => {
+      setLoading(false)
+    }, 1000)
 
-  const stats = {
-    totalWorkouts: workouts.length,
-    totalExercises: workouts.reduce((sum, workout) => sum + workout.exercises.length, 0),
-    totalSets: workouts.reduce(
-      (sum, workout) =>
-        sum + workout.exercises.reduce((exerciseSum, exercise) => exerciseSum + exercise.sets.length, 0),
-      0,
-    ),
-    totalVolume: Math.round(
-      workouts.reduce(
-        (sum, workout) =>
-          sum +
-          workout.exercises.reduce(
-            (exerciseSum, exercise) =>
-              exerciseSum + exercise.sets.reduce((setSum, set) => setSum + set.weight * set.reps, 0),
-            0,
-          ),
-        0,
-      ),
-    ),
-  }
+    return () => clearTimeout(timer)
+  }, [])
 
-  const uniqueExercises = Array.from(
-    new Set(workouts.flatMap((workout) => workout.exercises.map((exercise) => exercise.name))),
-  ).sort()
+  const handleWorkoutSubmit = (workout: Workout) => {
+    setWorkouts((prev) => [workout, ...prev])
+  }
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-400 to-orange-400 flex items-center justify-center">
-        <motion.div
-          className="bg-white/20 backdrop-blur-xl p-8 rounded-3xl"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-        >
-          <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin" />
-        </motion.div>
-      </div>
-    )
+    return <LoadingSpinner />
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-400 to-orange-400">
-      <CustomCursor />
-      <Header
-        user={user}
-        onSignOut={onSignOut}
-        onToggleNotifications={() => setShowNotifications(!showNotifications)}
-      />
+  const tabs = [
+    { id: "log-workout", label: "Log Workout", icon: Plus },
+    { id: "dashboard", label: "Dashboard", icon: TrendingUp },
+    { id: "history", label: "History", icon: Dumbbell },
+    { id: "calendar", label: "Calendar", icon: Calendar },
+    { id: "profile", label: "Profile", icon: User },
+  ]
 
-      {/* Guest Mode Warning */}
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+      {/* Guest Warning Banner */}
       {user.isAnonymous && (
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4"
+          className="bg-yellow-400 text-yellow-900 px-4 py-3 text-center font-medium"
         >
-          <div className="bg-yellow-500/20 backdrop-blur-xl border border-yellow-500/30 rounded-2xl p-4 text-center">
-            <p className="text-white font-semibold">
-              👤 You're using Guest Mode - Your data won't be saved permanently. Sign up to keep your progress!
-            </p>
-          </div>
+          You're using RackMate as a guest. Your data won't be saved permanently.{" "}
+          <button className="underline font-bold hover:no-underline">Sign up to save your progress</button>
         </motion.div>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Tab Navigation */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex space-x-2 bg-white/20 backdrop-blur-xl rounded-3xl p-2 shadow-xl mb-8 border border-white/30"
-        >
-          <motion.button
-            onClick={() => setActiveTab("dashboard")}
-            className={`flex-1 py-3 px-6 rounded-2xl text-sm font-bold transition-all duration-300 ${
-              activeTab === "dashboard" ? "bg-white text-purple-600 shadow-lg" : "text-white hover:bg-white/20"
-            }`}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            📊 Dashboard
-          </motion.button>
-          <motion.button
-            onClick={() => setActiveTab("log")}
-            className={`flex-1 py-3 px-6 rounded-2xl text-sm font-bold transition-all duration-300 ${
-              activeTab === "log" ? "bg-white text-purple-600 shadow-lg" : "text-white hover:bg-white/20"
-            }`}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            💪 Log Workout
-          </motion.button>
-        </motion.div>
+      <Header
+        user={user}
+        onSignOut={onSignOut}
+        showNotifications={showNotifications}
+        setShowNotifications={setShowNotifications}
+      />
 
-        {/* Content */}
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3 }}
+      <div className="flex">
+        {/* Sidebar */}
+        <motion.aside
+          initial={{ x: -100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          className="w-64 bg-white shadow-lg h-screen sticky top-0 border-r border-gray-200"
         >
-          {activeTab === "dashboard" ? (
-            <div className="space-y-8">
-              <StatsCards stats={stats} />
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <ProgressChart workouts={workouts} exercises={uniqueExercises} />
-                <WorkoutHistory workouts={workouts.slice(0, 10)} />
-              </div>
-            </div>
-          ) : (
-            <WorkoutForm onAddWorkout={addWorkout} />
-          )}
-        </motion.div>
+          <div className="p-6">
+            <nav className="space-y-2">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
+                    activeTab === tab.id
+                      ? "bg-blue-600 text-white shadow-lg"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  }`}
+                >
+                  <tab.icon className="h-5 w-5" />
+                  <span>{tab.label}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+        </motion.aside>
+
+        {/* Main Content */}
+        <main className="flex-1 p-6">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {activeTab === "log-workout" && <WorkoutForm onSubmit={handleWorkoutSubmit} />}
+              {activeTab === "dashboard" && (
+                <div className="space-y-6">
+                  <StatsCards workouts={workouts} />
+                  <ProgressChart workouts={workouts} />
+                </div>
+              )}
+              {activeTab === "history" && <WorkoutHistory workouts={workouts} />}
+              {activeTab === "calendar" && <CalendarWidget workouts={workouts} />}
+              {activeTab === "profile" && (
+                <div className="bg-white rounded-2xl p-8 shadow-lg">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-6">Profile Settings</h2>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Display Name</label>
+                      <input
+                        type="text"
+                        value={user.displayName || ""}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Enter your name"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                      <input
+                        type="email"
+                        value={user.email || ""}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
+                        disabled
+                      />
+                    </div>
+                    <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                      Save Changes
+                    </button>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </main>
       </div>
 
-      {/* Notification Panel */}
-      <NotificationPanel isOpen={showNotifications} onClose={() => setShowNotifications(false)} />
+      {/* Notifications Panel */}
+      <AnimatePresence>
+        {showNotifications && <NotificationPanel onClose={() => setShowNotifications(false)} />}
+      </AnimatePresence>
     </div>
   )
 }

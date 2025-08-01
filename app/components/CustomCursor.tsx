@@ -15,15 +15,14 @@ export default function CustomCursor() {
     const handleMouseEnter = () => setIsHovering(true)
     const handleMouseLeave = () => setIsHovering(false)
 
-    // Add event listeners for interactive elements
-    const interactiveElements = document.querySelectorAll('button, a, input, [role="button"]')
+    window.addEventListener("mousemove", updateMousePosition)
 
+    // Add hover listeners to interactive elements
+    const interactiveElements = document.querySelectorAll("button, a, [role='button']")
     interactiveElements.forEach((el) => {
       el.addEventListener("mouseenter", handleMouseEnter)
       el.addEventListener("mouseleave", handleMouseLeave)
     })
-
-    window.addEventListener("mousemove", updateMousePosition)
 
     return () => {
       window.removeEventListener("mousemove", updateMousePosition)

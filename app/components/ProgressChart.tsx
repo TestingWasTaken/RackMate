@@ -1,86 +1,72 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { TrendingUp } from "lucide-react"
-
-interface Workout {
-  id: string
-  name: string
-  date: string
-  exercises: Array<{
-    name: string
-    sets: Array<{
-      reps: number
-      weight: number
-    }>
-  }>
-}
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import type { Workout } from "../types/workout"
 
 interface ProgressChartProps {
   workouts: Workout[]
-  exercises: string[]
 }
 
-export default function ProgressChart({ workouts, exercises }: ProgressChartProps) {
-  const getExerciseProgress = (exerciseName: string) => {
-    return workouts
-      .filter((workout) => workout.exercises.some((ex) => ex.name === exerciseName))
-      .map((workout) => {
-        const exercise = workout.exercises.find((ex) => ex.name === exerciseName)
-        if (!exercise) return null
+export default function ProgressChart({ workouts }: ProgressChartProps) {
+  // Generate chart data from workouts
+  const chartData = workouts
+    .slice(-10) // Last 10 workouts
+    .reverse()
+    .map((workout, index) => {
+      const totalWeight = workout.exercises.reduce(
+        (sum, exercise) => sum + exercise.sets.reduce((setSum, set) => setSum + set.weight * set.reps, 0),
+        0,
+      )
 
-        const maxWeight = Math.max(...exercise.sets.map((set) => set.weight))
-        return {
-          date: new Date(workout.date).toLocaleDateString(),
-          weight: maxWeight,
-        }
-      })
-      .filter(Boolean)
-      .slice(-10) // Last 10 workouts
-  }
-
-  const selectedExercise = exercises[0] || "No exercises yet"
-  const progressData = exercises.length > 0 ? getExerciseProgress(selectedExercise) : []
+      return {
+        workout: `Workout ${index + 1}`,
+        totalWeight,
+        date: new Date(workout.date).toLocaleDateString(),
+      }
+    })
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white/20 backdrop-blur-xl rounded-3xl p-8 border border-white/30 shadow-xl"
+      transition={{ duration: 0.5, delay: 0.2 }}
+      className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100"
     >
-      <div className="flex items-center space-x-3 mb-6">
-        <div className="bg-white/20 backdrop-blur-sm p-3 rounded-2xl">
-          <TrendingUp className="h-6 w-6 text-white" />
-        </div>
-        <h3 className="text-2xl font-bold text-white">Progress Chart</h3>
-      </div>
+      <h3 className="text-xl font-bold text-gray-800 mb-6">Progress Overview</h3>
 
-      {progressData.length > 0 ? (
-        <div className="space-y-4">
-          <p className="text-white/80">Tracking: {selectedExercise}</p>
-          <div className="h-64 flex items-end space-x-2">
-            {progressData.map((data, index) => (
-              <motion.div
-                key={index}
-                className="flex-1 bg-gradient-to-t from-white/30 to-white/60 rounded-t-lg relative"
-                initial={{ height: 0 }}
-                animate={{ height: `${(data.weight / Math.max(...progressData.map((d) => d.weight))) * 100}%` }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-              >
-                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-white text-xs font-semibold">
-                  {data.weight}
-                </div>
-                <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-white/60 text-xs">
-                  {data.date.split("/")[1]}/{data.date.split("/")[2]}
-                </div>
-              </motion.div>
-            ))}
-          </div>
+      {chartData.length > 0 ? (
+        <div className="h-80">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="workout" stroke="#6b7280" fontSize={12} />
+              <YAxis stroke="#6b7280" fontSize={12} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "white",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="totalWeight"
+                stroke="#3b82f6"
+                strokeWidth={3}
+                dot={{ fill: "#3b82f6", strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, stroke: "#3b82f6", strokeWidth: 2 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       ) : (
-        <div className="text-center py-12">
-          <p className="text-white/60 text-lg">No workout data yet</p>
-          <p className="text-white/40 text-sm mt-2">Start logging workouts to see your progress!</p>
+        <div className="h-80 flex items-center justify-center text-gray-500">
+          <div className="text-center">
+            <p className="text-lg font-medium mb-2">No workout data yet</p>
+            <p className="text-sm">Start logging workouts to see your progress!</p>
+          </div>
         </div>
       )}
     </motion.div>
