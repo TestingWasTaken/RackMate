@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { onAuthStateChanged, type User } from "firebase/auth"
+import { onAuthStateChanged, signInAnonymously, type User } from "firebase/auth"
 import { auth } from "./lib/firebase"
 import LandingPage from "./components/LandingPage"
 import Dashboard from "./components/Dashboard"
@@ -20,9 +20,17 @@ export default function RackMate() {
     return () => unsubscribe()
   }, [])
 
+  const handleGuestLogin = async () => {
+    try {
+      await signInAnonymously(auth)
+    } catch (error) {
+      console.error("Error signing in as guest:", error)
+    }
+  }
+
   if (loading) {
     return <LoadingSpinner />
   }
 
-  return user ? <Dashboard user={user} /> : <LandingPage />
+  return user ? <Dashboard user={user} /> : <LandingPage onGuestLogin={handleGuestLogin} />
 }

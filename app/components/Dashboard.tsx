@@ -104,6 +104,21 @@ export default function Dashboard({ user }: DashboardProps) {
       <CustomCursor />
       <Header user={user} onToggleNotifications={() => setShowNotifications(!showNotifications)} />
 
+      {/* Add this after the Header component */}
+      {user.isAnonymous && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4"
+        >
+          <div className="bg-yellow-500/20 backdrop-blur-xl border border-yellow-500/30 rounded-2xl p-4 text-center">
+            <p className="text-white font-semibold">
+              👤 You're using Guest Mode - Your data won't be saved permanently
+            </p>
+          </div>
+        </motion.div>
+      )}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Tab Navigation */}
         <motion.div
