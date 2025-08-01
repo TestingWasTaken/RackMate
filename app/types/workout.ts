@@ -14,4 +14,5 @@ export interface Workout {
   exercises: Exercise[]
   date: string
   duration: number
+  userId?: string
 }

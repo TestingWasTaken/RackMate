@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import { motion } from "framer-motion"
 import type { Workout } from "../types/workout"
 
 interface ProgressChartProps {
@@ -58,18 +59,26 @@ export default function ProgressChart({ workouts, exercises }: ProgressChartProp
                   {
                     label: "Estimated 1RM (lbs)",
                     data: exerciseData.map((d) => d?.oneRM),
-                    borderColor: "rgb(59, 130, 246)",
-                    backgroundColor: "rgba(59, 130, 246, 0.1)",
-                    tension: 0.1,
+                    borderColor: "rgba(255, 255, 255, 0.9)",
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    tension: 0.4,
                     fill: true,
+                    pointBackgroundColor: "rgba(255, 255, 255, 1)",
+                    pointBorderColor: "rgba(255, 255, 255, 1)",
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
                   },
                   {
                     label: "Max Weight (lbs)",
                     data: exerciseData.map((d) => d?.maxWeight),
-                    borderColor: "rgb(16, 185, 129)",
-                    backgroundColor: "rgba(16, 185, 129, 0.1)",
-                    tension: 0.1,
+                    borderColor: "rgba(255, 255, 255, 0.6)",
+                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    tension: 0.4,
                     fill: false,
+                    pointBackgroundColor: "rgba(255, 255, 255, 0.8)",
+                    pointBorderColor: "rgba(255, 255, 255, 0.8)",
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
                   },
                 ],
               },
@@ -79,11 +88,22 @@ export default function ProgressChart({ workouts, exercises }: ProgressChartProp
                 plugins: {
                   title: {
                     display: true,
-                    text: `${selectedExercise} Progress`,
+                    text: `${selectedExercise} Progress 📈`,
+                    color: "white",
+                    font: {
+                      size: 18,
+                      weight: "bold",
+                    },
                   },
                   legend: {
                     display: true,
                     position: "top",
+                    labels: {
+                      color: "white",
+                      font: {
+                        weight: "bold",
+                      },
+                    },
                   },
                 },
                 scales: {
@@ -92,12 +112,32 @@ export default function ProgressChart({ workouts, exercises }: ProgressChartProp
                     title: {
                       display: true,
                       text: "Weight (lbs)",
+                      color: "white",
+                      font: {
+                        weight: "bold",
+                      },
+                    },
+                    ticks: {
+                      color: "rgba(255, 255, 255, 0.8)",
+                    },
+                    grid: {
+                      color: "rgba(255, 255, 255, 0.1)",
                     },
                   },
                   x: {
                     title: {
                       display: true,
                       text: "Date",
+                      color: "white",
+                      font: {
+                        weight: "bold",
+                      },
+                    },
+                    ticks: {
+                      color: "rgba(255, 255, 255, 0.8)",
+                    },
+                    grid: {
+                      color: "rgba(255, 255, 255, 0.1)",
                     },
                   },
                 },
@@ -117,33 +157,46 @@ export default function ProgressChart({ workouts, exercises }: ProgressChartProp
 
   if (exercises.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Progress Chart</h3>
-        <p className="text-gray-500">No exercises to display yet.</p>
-      </div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white/20 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 p-8"
+      >
+        <h3 className="text-2xl font-bold text-white mb-6 text-center">Progress Chart 📈</h3>
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">📊</div>
+          <p className="text-white/70 text-lg">No exercises to display yet.</p>
+          <p className="text-white/50">Start logging workouts to see your progress!</p>
+        </div>
+      </motion.div>
     )
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">Progress Chart</h3>
-        <select
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="bg-white/20 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 p-8"
+    >
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-2xl font-bold text-white">Progress Chart 📈</h3>
+        <motion.select
           value={selectedExercise}
           onChange={(e) => setSelectedExercise(e.target.value)}
-          className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="px-4 py-2 bg-white/20 border border-white/30 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-white/50 backdrop-blur-xl"
+          whileHover={{ scale: 1.02 }}
         >
           {exercises.map((exercise) => (
-            <option key={exercise} value={exercise}>
+            <option key={exercise} value={exercise} className="bg-purple-600 text-white">
               {exercise}
             </option>
           ))}
-        </select>
+        </motion.select>
       </div>
 
-      <div className="h-64">
-        <canvas ref={canvasRef}></canvas>
+      <div className="h-80 relative">
+        <canvas ref={canvasRef} className="rounded-2xl"></canvas>
       </div>
-    </div>
+    </motion.div>
   )
 }
