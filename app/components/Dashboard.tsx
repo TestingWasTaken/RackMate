@@ -1,9 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import type { User } from "firebase/auth"
-import { collection, addDoc, getDocs, query, orderBy, where } from "firebase/firestore"
-import { db } from "../lib/firebase"
+import { useState } from "react"
 import { motion } from "framer-motion"
 import Header from "./Header"
 import WorkoutForm from "./WorkoutForm"
@@ -12,51 +9,47 @@ import WorkoutHistory from "./WorkoutHistory"
 import StatsCards from "./StatsCards"
 import NotificationPanel from "./NotificationPanel"
 import CustomCursor from "./CustomCursor"
-import type { Workout } from "../types/workout"
+
+interface User {
+  uid: string
+  email: string | null
+  isAnonymous: boolean
+  displayName: string | null
+}
+
+interface Workout {
+  id: string
+  name: string
+  date: string
+  exercises: Array<{
+    name: string
+    sets: Array<{
+      reps: number
+      weight: number
+    }>
+  }>
+  userId: string
+}
 
 interface DashboardProps {
   user: User
+  onSignOut: () => void
+  startWithWorkoutLogger?: boolean
 }
 
-export default function Dashboard({ user }: DashboardProps) {
+export default function Dashboard({ user, onSignOut, startWithWorkoutLogger = false }: DashboardProps) {
   const [workouts, setWorkouts] = useState<Workout[]>([])
-  const [activeTab, setActiveTab] = useState<"log" | "dashboard">("dashboard")
-  const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState<"log" | "dashboard">(startWithWorkoutLogger ? "log" : "dashboard")
+  const [loading, setLoading] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
 
-  useEffect(() => {
-    fetchWorkouts()
-  }, [user])
-
-  const fetchWorkouts = async () => {
-    try {
-      const q = query(collection(db, "workouts"), where("userId", "==", user.uid), orderBy("date", "desc"))
-      const querySnapshot = await getDocs(q)
-      const workoutData: Workout[] = []
-
-      querySnapshot.forEach((doc) => {
-        workoutData.push({ id: doc.id, ...doc.data() } as Workout)
-      })
-
-      setWorkouts(workoutData)
-    } catch (error) {
-      console.error("Error fetching workouts:", error)
-    } finally {
-      setLoading(false)
+  const addWorkout = (workoutData: Omit<Workout, "id">) => {
+    const newWorkout = {
+      id: `workout_${Date.now()}`,
+      ...workoutData,
+      userId: user.uid,
     }
-  }
-
-  const addWorkout = async (workoutData: Omit<Workout, "id">) => {
-    try {
-      const docRef = await addDoc(collection(db, "workouts"), {
-        ...workoutData,
-        userId: user.uid,
-      })
-      const newWorkout = { id: docRef.id, ...workoutData }
-      setWorkouts([newWorkout, ...workouts])
-    } catch (error) {
-      console.error("Error adding workout:", error)
-    }
+    setWorkouts([newWorkout, ...workouts])
   }
 
   const stats = {
@@ -102,9 +95,13 @@ export default function Dashboard({ user }: DashboardProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-400 to-orange-400">
       <CustomCursor />
-      <Header user={user} onToggleNotifications={() => setShowNotifications(!showNotifications)} />
+      <Header
+        user={user}
+        onSignOut={onSignOut}
+        onToggleNotifications={() => setShowNotifications(!showNotifications)}
+      />
 
-      {/* Add this after the Header component */}
+      {/* Guest Mode Warning */}
       {user.isAnonymous && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -113,7 +110,7 @@ export default function Dashboard({ user }: DashboardProps) {
         >
           <div className="bg-yellow-500/20 backdrop-blur-xl border border-yellow-500/30 rounded-2xl p-4 text-center">
             <p className="text-white font-semibold">
-              👤 You're using Guest Mode - Your data won't be saved permanently
+              👤 You're using Guest Mode - Your data won't be saved permanently. Sign up to keep your progress!
             </p>
           </div>
         </motion.div>

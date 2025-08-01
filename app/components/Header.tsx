@@ -2,32 +2,30 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { signOut, type User } from "firebase/auth"
-import { auth } from "../lib/firebase"
 import { Dumbbell, Bell, Settings, LogOut, Calendar, UserIcon } from "lucide-react"
 import CalendarWidget from "./CalendarWidget"
 
+interface User {
+  uid: string
+  email: string | null
+  isAnonymous: boolean
+  displayName: string | null
+}
+
 interface HeaderProps {
   user: User
+  onSignOut: () => void
   onToggleNotifications: () => void
 }
 
-export default function Header({ user, onToggleNotifications }: HeaderProps) {
+export default function Header({ user, onSignOut, onToggleNotifications }: HeaderProps) {
   const [showCalendar, setShowCalendar] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
-
-  const handleSignOut = async () => {
-    try {
-      await signOut(auth)
-    } catch (error) {
-      console.error("Error signing out:", error)
-    }
-  }
 
   const handleSignUpConversion = () => {
     // This would typically open a sign-up modal or redirect
     // For now, we'll just sign out to return to the landing page
-    handleSignOut()
+    onSignOut()
   }
 
   return (
@@ -117,7 +115,7 @@ export default function Header({ user, onToggleNotifications }: HeaderProps) {
                       <span>Settings</span>
                     </motion.button>
                     <motion.button
-                      onClick={handleSignOut}
+                      onClick={onSignOut}
                       className="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-white/20 transition-colors text-white"
                       whileHover={{ x: 4 }}
                     >

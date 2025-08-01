@@ -15,14 +15,15 @@ export default function CustomCursor() {
     const handleMouseEnter = () => setIsHovering(true)
     const handleMouseLeave = () => setIsHovering(false)
 
-    window.addEventListener("mousemove", updateMousePosition)
+    // Add event listeners for interactive elements
+    const interactiveElements = document.querySelectorAll('button, a, input, [role="button"]')
 
-    // Add hover listeners to interactive elements
-    const interactiveElements = document.querySelectorAll("button, a, input, [role='button']")
     interactiveElements.forEach((el) => {
       el.addEventListener("mouseenter", handleMouseEnter)
       el.addEventListener("mouseleave", handleMouseLeave)
     })
+
+    window.addEventListener("mousemove", updateMousePosition)
 
     return () => {
       window.removeEventListener("mousemove", updateMousePosition)
@@ -34,37 +35,18 @@ export default function CustomCursor() {
   }, [])
 
   return (
-    <>
-      {/* Main cursor */}
-      <motion.div
-        className="fixed top-0 left-0 w-6 h-6 bg-white/30 backdrop-blur-sm rounded-full pointer-events-none z-50 mix-blend-difference"
-        animate={{
-          x: mousePosition.x - 12,
-          y: mousePosition.y - 12,
-          scale: isHovering ? 1.5 : 1,
-        }}
-        transition={{
-          type: "spring",
-          stiffness: 500,
-          damping: 28,
-          mass: 0.5,
-        }}
-      />
-
-      {/* Trailing cursor */}
-      <motion.div
-        className="fixed top-0 left-0 w-2 h-2 bg-white/50 rounded-full pointer-events-none z-40"
-        animate={{
-          x: mousePosition.x - 4,
-          y: mousePosition.y - 4,
-        }}
-        transition={{
-          type: "spring",
-          stiffness: 150,
-          damping: 15,
-          mass: 0.1,
-        }}
-      />
-    </>
+    <motion.div
+      className="fixed top-0 left-0 w-6 h-6 bg-white/30 rounded-full pointer-events-none z-50 mix-blend-difference"
+      animate={{
+        x: mousePosition.x - 12,
+        y: mousePosition.y - 12,
+        scale: isHovering ? 1.5 : 1,
+      }}
+      transition={{
+        type: "spring",
+        stiffness: 500,
+        damping: 28,
+      }}
+    />
   )
 }
