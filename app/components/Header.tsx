@@ -1,7 +1,8 @@
 "use client"
 
-import { Bell, LogOut, Dumbbell } from "lucide-react"
+import { Bell, LogOut, Dumbbell } from 'lucide-react'
 import { motion } from "framer-motion"
+import { useAuth } from "./AuthContext"
 
 interface HeaderProps {
   user: {
@@ -10,12 +11,13 @@ interface HeaderProps {
     displayName?: string | null
     isAnonymous?: boolean
   }
-  onSignOut: () => void
   showNotifications: boolean
   setShowNotifications: (show: boolean) => void
 }
 
-export default function Header({ user, onSignOut, showNotifications, setShowNotifications }: HeaderProps) {
+export default function Header({ user, showNotifications, setShowNotifications }: HeaderProps) {
+  const { signOut } = useAuth()
+
   return (
     <motion.header
       initial={{ opacity: 0, y: -20 }}
@@ -57,7 +59,7 @@ export default function Header({ user, onSignOut, showNotifications, setShowNoti
             )}
 
             <button
-              onClick={onSignOut}
+              onClick={signOut}
               className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
               aria-label="Sign out"
             >

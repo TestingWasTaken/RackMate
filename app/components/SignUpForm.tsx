@@ -3,27 +3,39 @@
 import type React from "react"
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { ArrowLeft, Mail, Lock, User, Eye, EyeOff } from "lucide-react"
+import { ArrowLeft, Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
+import { useAuth } from "./AuthContext"
 
-interface SignUpFormProps {
-  onBack: () => void
-}
+interface SignUpFormProps {}
 
-export default function SignUpForm({ onBack }: SignUpFormProps) {
+export default function SignUpForm({}: SignUpFormProps) {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const { signUp } = useAuth()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (password !== confirmPassword) {
-      alert("Passwords don't match!")
+      setError("Passwords don't match!")
       return
     }
-    console.log("Signup attempt:", { name, email, password })
+    
+    setLoading(true)
+    setError("")
+    
+    try {
+      await signUp(email, password, name)
+    } catch (err) {
+      setError("Failed to create account")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -38,7 +50,7 @@ export default function SignUpForm({ onBack }: SignUpFormProps) {
         >
           <div className="flex items-center mb-8">
             <button
-              onClick={onBack}
+              onClick={() => window.history.back()}
               className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors border border-white/20 hover:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50"
               aria-label="Go back"
             >
@@ -46,6 +58,12 @@ export default function SignUpForm({ onBack }: SignUpFormProps) {
             </button>
             <h2 className="text-2xl font-bold text-white ml-4">Join RackMate</h2>
           </div>
+
+          {error && (
+            <div className="mb-4 text-center text-red-500">
+              <p>{error}</p>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
@@ -151,8 +169,9 @@ export default function SignUpForm({ onBack }: SignUpFormProps) {
             <button
               type="submit"
               className="w-full bg-white text-purple-600 py-3 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:bg-gray-50 transition-all duration-200 border-2 border-transparent hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
+              disabled={loading}
             >
-              Create Account
+              {loading ? "Creating Account..." : "Create Account"}
             </button>
           </form>
 
@@ -160,7 +179,7 @@ export default function SignUpForm({ onBack }: SignUpFormProps) {
             <p className="text-white/80">
               Already have an account?{" "}
               <button
-                onClick={onBack}
+                onClick={() => window.history.back()}
                 className="text-white font-semibold hover:underline focus:outline-none focus:underline"
               >
                 Sign in here

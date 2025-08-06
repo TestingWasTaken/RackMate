@@ -2,18 +2,20 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { Dumbbell, TrendingUp, Users } from "lucide-react"
+import { Dumbbell, TrendingUp, Users } from 'lucide-react'
 import LoginForm from "./LoginForm"
 import SignUpForm from "./SignUpForm"
 import CustomCursor from "./CustomCursor"
+import { useAuth } from "./AuthContext"
+import WorkoutCounter from "./WorkoutCounter"
 
 interface LandingPageProps {
-  onGuestLogin: () => void
 }
 
-export default function LandingPage({ onGuestLogin }: LandingPageProps) {
+export default function LandingPage({ }: LandingPageProps) {
   const [showLogin, setShowLogin] = useState(false)
   const [showSignUp, setShowSignUp] = useState(false)
+  const { signInAsGuest } = useAuth()
 
   if (showLogin) {
     return <LoginForm onBack={() => setShowLogin(false)} />
@@ -78,7 +80,7 @@ export default function LandingPage({ onGuestLogin }: LandingPageProps) {
                 Sign In
               </button>
               <button
-                onClick={onGuestLogin}
+                onClick={signInAsGuest}
                 className="text-white/90 hover:text-white font-medium transition-colors duration-200"
               >
                 Try Demo
@@ -132,23 +134,16 @@ export default function LandingPage({ onGuestLogin }: LandingPageProps) {
                   </motion.button>
 
                   {/* App Store Badges */}
-                  <div className="flex items-center space-x-3">
-                    <div className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20">
-                      <span className="text-white/80 text-sm font-medium">App Store</span>
-                    </div>
-                    <div className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20">
-                      <span className="text-white/80 text-sm font-medium">Google Play</span>
-                    </div>
-                  </div>
                 </motion.div>
 
+                {/* Dynamic Stats Counter */}
                 <motion.p
                   className="text-white/70 text-sm"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.6, delay: 0.5 }}
                 >
-                  Over 50,000 workouts logged
+                  <WorkoutCounter />
                 </motion.p>
               </div>
 

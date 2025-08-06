@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Calendar, TrendingUp, Dumbbell, User, Plus } from "lucide-react"
+import { Calendar, TrendingUp, Dumbbell, User, Plus } from 'lucide-react'
 import Header from "./Header"
 import StatsCards from "./StatsCards"
 import ProgressChart from "./ProgressChart"
@@ -12,6 +12,7 @@ import CalendarWidget from "./CalendarWidget"
 import NotificationPanel from "./NotificationPanel"
 import LoadingSpinner from "./LoadingSpinner"
 import type { Workout } from "../types/workout"
+import { useAuth } from "./AuthContext"
 
 interface DashboardProps {
   user: {
@@ -20,14 +21,14 @@ interface DashboardProps {
     displayName?: string | null
     isAnonymous?: boolean
   }
-  onSignOut: () => void
 }
 
-export default function Dashboard({ user, onSignOut }: DashboardProps) {
+export default function Dashboard({ user }: DashboardProps) {
   const [activeTab, setActiveTab] = useState("log-workout")
   const [workouts, setWorkouts] = useState<Workout[]>([])
   const [loading, setLoading] = useState(true)
   const [showNotifications, setShowNotifications] = useState(false)
+  const { signOut } = useAuth()
 
   useEffect(() => {
     // Simulate loading
@@ -70,7 +71,6 @@ export default function Dashboard({ user, onSignOut }: DashboardProps) {
 
       <Header
         user={user}
-        onSignOut={onSignOut}
         showNotifications={showNotifications}
         setShowNotifications={setShowNotifications}
       />

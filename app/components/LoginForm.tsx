@@ -3,20 +3,36 @@
 import type React from "react"
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { ArrowLeft, Mail, Lock, Eye, EyeOff } from "lucide-react"
+import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react'
+import { useAuth } from "./AuthContext"
 
-interface LoginFormProps {
-  onBack: () => void
-}
+interface LoginFormProps {}
 
-export default function LoginForm({ onBack }: LoginFormProps) {
+export default function LoginForm({}: LoginFormProps) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const { signIn } = useAuth()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Login attempt:", { email, password })
+    setLoading(true)
+    setError("")
+    
+    try {
+      await signIn(email, password)
+    } catch (err) {
+      setError("Invalid email or password")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleBack = () => {
+    // This will be handled by the parent component
+    window.history.back()
   }
 
   return (
@@ -31,7 +47,7 @@ export default function LoginForm({ onBack }: LoginFormProps) {
         >
           <div className="flex items-center mb-8">
             <button
-              onClick={onBack}
+              onClick={handleBack}
               className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors border border-white/20 hover:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50"
               aria-label="Go back"
             >
@@ -91,11 +107,18 @@ export default function LoginForm({ onBack }: LoginFormProps) {
               </div>
             </div>
 
+            {error && (
+              <div className="text-red-500 text-center">
+                {error}
+              </div>
+            )}
+
             <button
               type="submit"
+              disabled={loading}
               className="w-full bg-white text-purple-600 py-3 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:bg-gray-50 transition-all duration-200 border-2 border-transparent hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
             >
-              Sign In
+              {loading ? "Loading..." : "Sign In"}
             </button>
           </form>
 
@@ -103,7 +126,7 @@ export default function LoginForm({ onBack }: LoginFormProps) {
             <p className="text-white/80">
               Don't have an account?{" "}
               <button
-                onClick={onBack}
+                onClick={handleBack}
                 className="text-white font-semibold hover:underline focus:outline-none focus:underline"
               >
                 Sign up here
